@@ -1,36 +1,36 @@
-export type TimedSetOptions = {
-    ttl: number,
-    gc: number
-};
+export interface ITimedSetOptions {
+    gc: number;
+    ttl: number;
+}
 
-export type TimedSetListener<V> = (values: Array<V>) => void;
+export type TimedSetListener<V> = (values: V[]) => void;
 
-export class TimedSet<T = String> {
+export class TimedSet<T = string> {
     private gcTimer: number | undefined;
-    private entries : Map<T, number> = new Map<T, number>();
-    private buckets : Map<number, Set<T>> = new Map<number, Set<T>>();
-    private options : TimedSetOptions;
-    private listeners : Array<TimedSetListener<T>> = new Array<TimedSetListener<T>>();
+    private entries: Map<T, number> = new Map<T, number>();
+    private buckets: Map<number, Set<T>> = new Map<number, Set<T>>();
+    private options: ITimedSetOptions;
+    private listeners: Array<TimedSetListener<T>> = new Array<TimedSetListener<T>>();
 
-    constructor(options : Partial<TimedSetOptions> = {}) {
+    constructor(options: Partial<ITimedSetOptions> = {}) {
         this.options = Object.assign({
+            gc: 1000,
             ttl: 5000,
-            gc: 1000
         }, options);
     }
 
-    get size() : number {
+    public get size(): number {
         return this.entries.size;
     }
 
-    add(v: T) : void {
-        let id = this.bucketId();
+    public add(v: T): void {
+        const id = Math.floor(new Date().getTime() / this.options.gc);
 
         if (this.entries.has(v)) {
-            let currentId = this.entries.get(v);
+            const currentId = this.entries.get(v);
 
             if (currentId !== id) {
-                let bucket = this.buckets.get(currentId);
+                const bucket = this.buckets.get(currentId);
                 bucket.delete(v);
 
                 if (!bucket.size) {
@@ -39,23 +39,21 @@ export class TimedSet<T = String> {
             }
         }
 
-        let newBucket = this.createBucket(id);
+        const newBucket = this.createBucket(id);
         this.entries.set(v, id);
         newBucket.add(v);
 
         this.gc();
     }
 
-    clear() : void {
-        //console.log("CLEARING");
-
+    public clear(): void {
         this.entries.clear();
         this.buckets.clear();
 
         this.gc();
     }
 
-    delete(v: T) : void {
+    public delete(v: T): void {
         if (!this.entries.has(v)) {
             return;
         }
@@ -72,40 +70,35 @@ export class TimedSet<T = String> {
         this.gc();
     }
 
-    has(v: T) : boolean {
+    public has(v: T): boolean {
         if (!this.entries.has(v)) {
             return false;
         }
 
         const id = this.entries.get(v);
-        let expired = Math.floor((new Date().getTime()-this.options.ttl) / this.options.gc);
+        const expired = Math.floor((new Date().getTime() - this.options.ttl) / this.options.gc);
 
         return id >= expired;
     }
 
-    listen(f: TimedSetListener<T>) : void {
+    public listen(f: TimedSetListener<T>): void {
         this.listeners.push(f);
     }
 
-    private createBucket(id : number) : Set<T> {
-        let existingBucket = this.buckets.get(id);
+    private createBucket(id: number): Set<T> {
+        const existingBucket = this.buckets.get(id);
         if (existingBucket) {
             return existingBucket;
         }
 
-        let newBucket = new Set<T>();
+        const newBucket = new Set<T>();
         this.buckets.set(id, newBucket);
         return newBucket;
     }
 
-    private bucketId() : number {
-        return Math.floor(new Date().getTime() / this.options.gc);
-    }
-
-    private gc() : void {
+    private gc(): void {
         if (!this.entries.size) {
             if (this.gcTimer) {
-                //console.log("GC UNSCHEDULE", this.entries.size);
                 clearTimeout(this.gcTimer);
                 delete this.gcTimer;
             }
@@ -114,29 +107,26 @@ export class TimedSet<T = String> {
             return;
         }
 
-        //console.log("GC SCHEDULE", this.entries.size);
-
         this.gcTimer = setTimeout(() => this.__gc(), this.options.gc);
     }
 
-    private __gc() : void {
+    private __gc(): void {
         delete this.gcTimer;
 
-        let expired = Math.floor((new Date().getTime()-this.options.ttl) / this.options.gc);
+        const expired = Math.floor((new Date().getTime() - this.options.ttl) / this.options.gc);
 
-        let values : Array<T> = new Array<T>();
-        for (let [id, bucket] of this.buckets) {
+        let values: T[] = [];
+        for (const [id, bucket] of this.buckets) {
             if (id > expired) {
                 continue;
             }
 
             values = [...values, ...(bucket.values())];
 
-            //console.log("DELETING BUCKET", id);
             this.buckets.delete(id);
         }
 
-        for (let value of values) {
+        for (const value of values) {
             this.entries.delete(value);
         }
 
@@ -146,10 +136,10 @@ export class TimedSet<T = String> {
             return;
         }
 
-        for (let listener of this.listeners) {
+        for (const listener of this.listeners) {
             try {
                 listener(values);
-            } catch (e) {}
+            } catch (e) {} // tslint:disable-line
         }
     }
 }

@@ -1,6 +1,6 @@
 import {
+    ITimedSetOptions,
     TimedSet,
-    TimedSetOptions
 } from './TimedSet';
 
 import * as chai from 'chai';
@@ -64,7 +64,7 @@ describe('TimedSet', function () {
         expect((<any>set).gcTimer).to.equal(undefined);
     });
 
-    it('should GC expired entries', async function () {
+    it('should GC expire entries', async function () {
         const set = new TimedSet({
             ttl: 10,
             gc: 10

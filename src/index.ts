@@ -1,11 +1,11 @@
 import {
-    TimedSetOptions,
+    ITimedSetOptions,
+    TimedSet,
     TimedSetListener,
-    TimedSet
-} from './TimedSet';
+} from "./TimedSet";
 
 export {
-    TimedSetOptions,
+    ITimedSetOptions,
+    TimedSet,
     TimedSetListener,
-    TimedSet
 };
