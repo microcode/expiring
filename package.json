@@ -1,0 +1,23 @@
+{
+  "name": "@microcode/timed-set",
+  "version": "1.0.0",
+  "description": "Set container with timed expiry",
+  "main": "dist/index.js",
+  "author": "Jesper Svennevid <jesper@microcode.se>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/chai": "^4.2.4",
+    "@types/mocha": "^5.2.7",
+    "chai": "^4.2.0",
+    "mocha": "^6.2.2",
+    "ts-node": "^8.4.1",
+    "typescript": "^3.6.4"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "mocha -r ts-node/register src/**/*.spec.ts"
+  }
+}
