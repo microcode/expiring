@@ -3,27 +3,47 @@ export interface IExpiringSetOptions {
     ttl: number;
 }
 
+export interface ExpiringSet<T> {
+    add(value: T): this;
+    clear(): void;
+    delete(value: T): boolean;
+    //forEach(callbackFn: (value: T, value2: T, set: ExpiringSet<T>) => void, thisArg?: any): void;
+    has(value: T): boolean;
+    listen(f: ExpiringSetListener<T>): void;
+    readonly size: number;
+}
+
+interface ExpiringSetConstructor {
+    new <T = any>(values?: readonly T[] | null, options?: Partial<IExpiringSetOptions> | null): ExpiringSet<T>
+}
+
 export type ExpiringSetListener<V> = (values: V[]) => void;
 
-export class ExpiringSet<T = string> {
+class ExpiringSetImpl<T> implements ExpiringSet<T> {
     private gcTimer: number | undefined;
     private entries: Map<T, number> = new Map<T, number>();
     private buckets: Map<number, Set<T>> = new Map<number, Set<T>>();
     private options: IExpiringSetOptions;
     private listeners: Array<ExpiringSetListener<T>> = new Array<ExpiringSetListener<T>>();
 
-    constructor(options: Partial<IExpiringSetOptions> = {}) {
+    constructor(values?: readonly T[] | null, options: Partial<IExpiringSetOptions> = {}) {
         this.options = Object.assign({
             gc: 1000,
             ttl: 5000,
         }, options);
+
+        if (values) {
+            for (const value of values) {
+                this.add(value);
+            }
+        }
     }
 
     public get size(): number {
         return this.entries.size;
     }
 
-    public add(v: T): void {
+    public add(v: T): this {
         const id = Math.floor(new Date().getTime() / this.options.gc);
 
         if (this.entries.has(v)) {
@@ -44,6 +64,8 @@ export class ExpiringSet<T = string> {
         newBucket.add(v);
 
         this.gc();
+
+        return this;
     }
 
     public clear(): void {
@@ -53,9 +75,9 @@ export class ExpiringSet<T = string> {
         this.gc();
     }
 
-    public delete(v: T): void {
+    public delete(v: T): boolean {
         if (!this.entries.has(v)) {
-            return;
+            return false;
         }
 
         const id = this.entries.get(v);
@@ -68,6 +90,8 @@ export class ExpiringSet<T = string> {
         this.entries.delete(v);
 
         this.gc();
+
+        return true;
     }
 
     public has(v: T): boolean {
@@ -143,3 +167,5 @@ export class ExpiringSet<T = string> {
         }
     }
 }
+
+export const ExpiringSet: ExpiringSetConstructor = ExpiringSetImpl;

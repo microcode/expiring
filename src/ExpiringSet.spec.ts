@@ -13,6 +13,15 @@ async function sleep(ms : number) : Promise<void> {
 }
 
 describe('ExpiringSet', function () {
+    it('constructor can add values from iterable', function () {
+        const foo = "foo";
+        const set = new ExpiringSet([foo]);
+
+        expect(set.has(foo)).to.equal(true);
+
+        set.clear();
+    });
+
     it('add() should add entries', function () {
         const set = new ExpiringSet();
         const foo = "foo";
@@ -65,7 +74,7 @@ describe('ExpiringSet', function () {
     });
 
     it('should GC expire entries', async function () {
-        const set = new ExpiringSet({
+        const set = new ExpiringSet(null, {
             ttl: 10,
             gc: 10
         });
@@ -83,7 +92,7 @@ describe('ExpiringSet', function () {
     });
 
     it('should treat expired (but not yet deleted) values as gone', async function () {
-        const set = new ExpiringSet({
+        const set = new ExpiringSet(null, {
             ttl: 10,
             gc: 10
         });
@@ -105,7 +114,7 @@ describe('ExpiringSet', function () {
     });
 
     it('should switch GC buckets for values that have not yet been expired', async function () {
-        const set = new ExpiringSet({
+        const set = new ExpiringSet(null, {
             ttl: 10,
             gc: 10
         });
@@ -137,7 +146,7 @@ describe('ExpiringSet', function () {
     });
 
     it('should only GC expired values', async function () {
-        const set = new ExpiringSet<String>({
+        const set = new ExpiringSet<String>(null, {
             ttl: 30,
             gc: 10
         });
@@ -168,7 +177,7 @@ describe('ExpiringSet', function () {
     });
 
     it('should expire multiple buckets at once', async function () {
-        const set = new ExpiringSet<String>({
+        const set = new ExpiringSet<String>(null, {
             ttl: 10,
             gc: 10
         });

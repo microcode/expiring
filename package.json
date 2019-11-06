@@ -10,6 +10,7 @@
     "@types/chai": "^4.2.4",
     "@types/mocha": "^5.2.7",
     "chai": "^4.2.0",
+    "cross-var": "^1.1.0",
     "mocha": "^6.2.2",
     "ts-node": "^8.4.1",
     "tslint": "^5.20.1",
@@ -20,10 +21,11 @@
   ],
   "scripts": {
     "build": "tsc",
+    "clean": "rm -rf dist",
     "test": "mocha -r ts-node/register src/**/*.spec.ts",
     "lint": "tslint -p tsconfig.json",
-    "prepare": "yarn build",
-    "prepublishOnly": "yarn test && yarn lint",
-    "preversion": "yarn lint"
+    "prepare": "cross-var $npm_execpath run build",
+    "prepublishOnly": "cross-var $npm_execpath run test && cross-var $npm_execpath run lint",
+    "preversion": "cross-var $npm_execpath run lint"
   }
 }
