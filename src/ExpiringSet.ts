@@ -1,18 +1,18 @@
-export interface ITimedSetOptions {
+export interface IExpiringSetOptions {
     gc: number;
     ttl: number;
 }
 
-export type TimedSetListener<V> = (values: V[]) => void;
+export type ExpiringSetListener<V> = (values: V[]) => void;
 
-export class TimedSet<T = string> {
+export class ExpiringSet<T = string> {
     private gcTimer: number | undefined;
     private entries: Map<T, number> = new Map<T, number>();
     private buckets: Map<number, Set<T>> = new Map<number, Set<T>>();
-    private options: ITimedSetOptions;
-    private listeners: Array<TimedSetListener<T>> = new Array<TimedSetListener<T>>();
+    private options: IExpiringSetOptions;
+    private listeners: Array<ExpiringSetListener<T>> = new Array<ExpiringSetListener<T>>();
 
-    constructor(options: Partial<ITimedSetOptions> = {}) {
+    constructor(options: Partial<IExpiringSetOptions> = {}) {
         this.options = Object.assign({
             gc: 1000,
             ttl: 5000,
@@ -81,7 +81,7 @@ export class TimedSet<T = string> {
         return id >= expired;
     }
 
-    public listen(f: TimedSetListener<T>): void {
+    public listen(f: ExpiringSetListener<T>): void {
         this.listeners.push(f);
     }
 

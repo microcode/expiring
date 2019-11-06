@@ -1,11 +1,11 @@
 import {
-    ITimedSetOptions,
-    TimedSet,
-    TimedSetListener,
-} from "./TimedSet";
+    IExpiringSetOptions,
+    ExpiringSet,
+    ExpiringSetListener,
+} from "./ExpiringSet";
 
 export {
-    ITimedSetOptions,
-    TimedSet,
-    TimedSetListener,
+    IExpiringSetOptions,
+    ExpiringSet,
+    ExpiringSetListener,
 };

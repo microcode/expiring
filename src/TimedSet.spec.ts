@@ -1,7 +1,7 @@
 import {
-    ITimedSetOptions,
-    TimedSet,
-} from './TimedSet';
+    IExpiringSetOptions,
+    ExpiringSet,
+} from './ExpiringSet';
 
 import * as chai from 'chai';
 import 'mocha';
@@ -12,9 +12,9 @@ async function sleep(ms : number) : Promise<void> {
     return new Promise<void>(resolve => setTimeout(resolve, ms));
 }
 
-describe('TimedSet', function () {
+describe('ExpiringSet', function () {
     it('add() should add entries', function () {
-        const set = new TimedSet();
+        const set = new ExpiringSet();
         const foo = "foo";
 
         set.add(foo);
@@ -26,7 +26,7 @@ describe('TimedSet', function () {
     });
 
     it('delete() should remove entries', function () {
-        const set = new TimedSet();
+        const set = new ExpiringSet();
 
         const foo = "foo";
 
@@ -42,7 +42,7 @@ describe('TimedSet', function () {
     });
 
     it('clear() should remove all entries', function () {
-        const set = new TimedSet();
+        const set = new ExpiringSet();
 
         const foo1 = "foo1", foo2 = "foo2";
 
@@ -65,7 +65,7 @@ describe('TimedSet', function () {
     });
 
     it('should GC expire entries', async function () {
-        const set = new TimedSet({
+        const set = new ExpiringSet({
             ttl: 10,
             gc: 10
         });
@@ -83,7 +83,7 @@ describe('TimedSet', function () {
     });
 
     it('should treat expired (but not yet deleted) values as gone', async function () {
-        const set = new TimedSet({
+        const set = new ExpiringSet({
             ttl: 10,
             gc: 10
         });
@@ -105,7 +105,7 @@ describe('TimedSet', function () {
     });
 
     it('should switch GC buckets for values that have not yet been expired', async function () {
-        const set = new TimedSet({
+        const set = new ExpiringSet({
             ttl: 10,
             gc: 10
         });
@@ -137,7 +137,7 @@ describe('TimedSet', function () {
     });
 
     it('should only GC expired values', async function () {
-        const set = new TimedSet<String>({
+        const set = new ExpiringSet<String>({
             ttl: 30,
             gc: 10
         });
@@ -168,7 +168,7 @@ describe('TimedSet', function () {
     });
 
     it('should expire multiple buckets at once', async function () {
-        const set = new TimedSet<String>({
+        const set = new ExpiringSet<String>({
             ttl: 10,
             gc: 10
         });
