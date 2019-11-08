@@ -1,11 +1,11 @@
 import {
-    IExpiringSetOptions,
     ExpiringSet,
     ExpiringSetListener,
+    IExpiringSetOptions,
 } from "./ExpiringSet";
 
 export {
-    IExpiringSetOptions,
     ExpiringSet,
     ExpiringSetListener,
+    IExpiringSetOptions,
 };
