@@ -1,17 +1,22 @@
-Set data container with timed expiry
-====================================
+Data containers with expiry
+===========================
 
-This provides a variation of the `Set` data container where the data inserted into it expires after a set amount of time.
+This provides a set of data containers where the stored data is removed after a set time.
+
+This current containers that are implemented:
+
+`ExpiringSet` (a version of `Set`)
 
 Installation
 ------------
 
 ```
-npm install @microcode/expiring-set
-```
-
+npm install @microcode/expiring
 OR
+yarn add @microcode/expiring
+```
 
-```
-yarn add @microcode/expiring-set
-```
+License
+-------
+
+This is licensed under the MIT license. Please read `LICENSE` for details.

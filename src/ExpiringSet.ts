@@ -3,23 +3,24 @@ export interface IExpiringSetOptions {
     ttl: number;
 }
 
-export interface ExpiringSet<T> {
+export type ExpiringSetListener<V> = (values: V[]) => void;
+
+type ExpiringSetForEachCallbackFn<V> = (value: V, key: V, set: IExpiringSet<V>) => void;
+
+interface IExpiringSet<T> {
+    readonly size: number;
     add(value: T): this;
     clear(): void;
     delete(value: T): boolean;
-    //forEach(callbackFn: (value: T, value2: T, set: ExpiringSet<T>) => void, thisArg?: any): void;
+    forEach(callbackFn: ExpiringSetForEachCallbackFn<T>, thisArg?: any): void;
     has(value: T): boolean;
     listen(f: ExpiringSetListener<T>): void;
-    readonly size: number;
 }
 
-interface ExpiringSetConstructor {
-    new <T = any>(values?: readonly T[] | null, options?: Partial<IExpiringSetOptions> | null): ExpiringSet<T>
-}
+type IExpiringSetConstructor =
+    new <T = any>(values?: readonly T[] | null, options?: Partial<IExpiringSetOptions> | null) => IExpiringSet<T>;
 
-export type ExpiringSetListener<V> = (values: V[]) => void;
-
-class ExpiringSetImpl<T> implements ExpiringSet<T> {
+class ExpiringSetImpl<T> implements IExpiringSet<T> {
     private gcTimer: number | undefined;
     private entries: Map<T, number> = new Map<T, number>();
     private buckets: Map<number, Set<T>> = new Map<number, Set<T>>();
@@ -63,7 +64,7 @@ class ExpiringSetImpl<T> implements ExpiringSet<T> {
         this.entries.set(v, id);
         newBucket.add(v);
 
-        this.gc();
+        this.scheduleGarbageCollection();
 
         return this;
     }
@@ -72,7 +73,7 @@ class ExpiringSetImpl<T> implements ExpiringSet<T> {
         this.entries.clear();
         this.buckets.clear();
 
-        this.gc();
+        this.scheduleGarbageCollection();
     }
 
     public delete(v: T): boolean {
@@ -89,9 +90,22 @@ class ExpiringSetImpl<T> implements ExpiringSet<T> {
 
         this.entries.delete(v);
 
-        this.gc();
+        this.scheduleGarbageCollection();
 
         return true;
+    }
+
+    public forEach(callbackFn: ExpiringSetForEachCallbackFn<T>, thisArg?: any): void {
+        const self = this;
+        const expired = Math.floor((new Date().getTime() - this.options.ttl) / this.options.gc);
+
+        this.entries.forEach((value, key, map) => {
+            if (value < expired) {
+                return;
+            }
+
+            callbackFn.call(thisArg, key, key, self);
+        });
     }
 
     public has(v: T): boolean {
@@ -120,7 +134,7 @@ class ExpiringSetImpl<T> implements ExpiringSet<T> {
         return newBucket;
     }
 
-    private gc(): void {
+    private scheduleGarbageCollection(): void {
         if (!this.entries.size) {
             if (this.gcTimer) {
                 clearTimeout(this.gcTimer);
@@ -131,10 +145,10 @@ class ExpiringSetImpl<T> implements ExpiringSet<T> {
             return;
         }
 
-        this.gcTimer = setTimeout(() => this.__gc(), this.options.gc);
+        this.gcTimer = setTimeout(() => this.performGarbageCollection(), this.options.gc);
     }
 
-    private __gc(): void {
+    private performGarbageCollection(): void {
         delete this.gcTimer;
 
         const expired = Math.floor((new Date().getTime() - this.options.ttl) / this.options.gc);
@@ -154,7 +168,7 @@ class ExpiringSetImpl<T> implements ExpiringSet<T> {
             this.entries.delete(value);
         }
 
-        this.gc();
+        this.scheduleGarbageCollection();
 
         if (!values.length) {
             return;
@@ -168,4 +182,4 @@ class ExpiringSetImpl<T> implements ExpiringSet<T> {
     }
 }
 
-export const ExpiringSet: ExpiringSetConstructor = ExpiringSetImpl;
+export const ExpiringSet: IExpiringSetConstructor = ExpiringSetImpl;
