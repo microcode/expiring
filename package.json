@@ -1,7 +1,7 @@
 {
-  "name": "@microcode/timed-set",
-  "version": "1.0.0",
-  "description": "Set container with timed expiry",
+  "name": "@microcode/expiring",
+  "version": "0.0.1",
+  "description": "Data containers with expiry",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "author": "Jesper Svennevid <jesper@microcode.se>",
