@@ -1,20 +1,20 @@
 {
   "name": "@microcode/expiring",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Data containers with expiry",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "author": "Jesper Svennevid <jesper@microcode.se>",
   "license": "MIT",
   "devDependencies": {
-    "@types/chai": "^4.2.4",
-    "@types/mocha": "^5.2.7",
+    "@types/chai": "^4.2.11",
+    "@types/mocha": "^7.0.2",
     "chai": "^4.2.0",
     "cross-var": "^1.1.0",
-    "mocha": "^6.2.2",
-    "ts-node": "^8.4.1",
-    "tslint": "^5.20.1",
-    "typescript": "^3.6.4"
+    "mocha": "^7.1.1",
+    "ts-node": "^8.8.2",
+    "tslint": "^6.1.1",
+    "typescript": "^3.8.3"
   },
   "files": [
     "dist/**/*"
