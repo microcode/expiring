@@ -25,7 +25,7 @@ class ExpiringSetImpl<T> implements IExpiringSet<T> {
     private entries: Map<T, number> = new Map<T, number>();
     private buckets: Map<number, Set<T>> = new Map<number, Set<T>>();
     private options: IExpiringSetOptions;
-    private listeners: Array<ExpiringSetListener<T>> = new Array<ExpiringSetListener<T>>();
+    private listeners: ExpiringSetListener<T>[] = new Array<ExpiringSetListener<T>>();
 
     constructor(values?: readonly T[] | null, options: Partial<IExpiringSetOptions> = {}) {
         this.options = Object.assign({
