@@ -1,6 +1,6 @@
 {
   "name": "@microcode/expiring",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Data containers with expiry",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

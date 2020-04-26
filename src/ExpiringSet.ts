@@ -7,7 +7,7 @@ export type ExpiringSetListener<V> = (values: V[]) => void;
 
 type ExpiringSetForEachCallbackFn<V> = (value: V, key: V, set: IExpiringSet<V>) => void;
 
-interface IExpiringSet<T> {
+export interface IExpiringSet<T> {
     readonly size: number;
     add(value: T): this;
     clear(): void;
